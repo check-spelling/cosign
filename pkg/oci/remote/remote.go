@@ -116,13 +116,13 @@ func suffixTag(ref name.Reference, suffix string, o *options) (name.Tag, error) 
 	return o.TargetRepository.Tag(normalize(h, o.TagPrefix, suffix)), nil
 }
 
-type digestable interface {
+type digestible interface {
 	Digest() (v1.Hash, error)
 }
 
 // signatures is a shared implementation of the oci.Signed* Signatures method.
-func signatures(digestable digestable, o *options) (oci.Signatures, error) {
-	h, err := digestable.Digest()
+func signatures(digestible digestible, o *options) (oci.Signatures, error) {
+	h, err := digestible.Digest()
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +130,8 @@ func signatures(digestable digestable, o *options) (oci.Signatures, error) {
 }
 
 // attestations is a shared implementation of the oci.Signed* Attestations method.
-func attestations(digestable digestable, o *options) (oci.Signatures, error) {
-	h, err := digestable.Digest()
+func attestations(digestible digestible, o *options) (oci.Signatures, error) {
+	h, err := digestible.Digest()
 	if err != nil {
 		return nil, err
 	}
@@ -139,8 +139,8 @@ func attestations(digestable digestable, o *options) (oci.Signatures, error) {
 }
 
 // attachment is a shared implementation of the oci.Signed* Attachment method.
-func attachment(digestable digestable, attName string, o *options) (oci.File, error) {
-	h, err := digestable.Digest()
+func attachment(digestible digestible, attName string, o *options) (oci.File, error) {
+	h, err := digestible.Digest()
 	if err != nil {
 		return nil, err
 	}
