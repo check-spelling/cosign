@@ -116,13 +116,13 @@ func suffixTag(ref name.Reference, suffix string, o *options) (name.Tag, error) 
 	return o.TargetRepository.Tag(normalize(h, o.TagPrefix, suffix)), nil
 }
 
-type digestable interface {
+type digestible interface {
 	Digest() (v1.Hash, error)
 }
 
 // signatures is a shared implementation of the oci.Signed* Signatures method.
-func signatures(digestable digestable, o *options) (oci.Signatures, error) {
-	h, err := digestable.Digest()
+func signatures(digestible digestible, o *options) (oci.Signatures, error) {
+	h, err := digestible.Digest()
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +130,8 @@ func signatures(digestable digestable, o *options) (oci.Signatures, error) {
 }
 
 // attestations is a shared implementation of the oci.Signed* Attestations method.
-func attestations(digestable digestable, o *options) (oci.Signatures, error) {
-	h, err := digestable.Digest()
+func attestations(digestible digestible, o *options) (oci.Signatures, error) {
+	h, err := digestible.Digest()
 	if err != nil {
 		return nil, err
 	}
@@ -139,8 +139,8 @@ func attestations(digestable digestable, o *options) (oci.Signatures, error) {
 }
 
 // attachment is a shared implementation of the oci.Signed* Attachment method.
-func attachment(digestable digestable, attName string, o *options) (oci.File, error) {
-	h, err := digestable.Digest()
+func attachment(digestible digestible, attName string, o *options) (oci.File, error) {
+	h, err := digestible.Digest()
 	if err != nil {
 		return nil, err
 	}
@@ -156,26 +156,26 @@ func attachment(digestable digestable, attName string, o *options) (oci.File, er
 		return nil, fmt.Errorf("expected exactly one layer in attachment, got %d", len(ls))
 	}
 
-	return &attache{
+	return &attached{
 		SignedImage: img,
 		layer:       ls[0],
 	}, nil
 }
 
-type attache struct {
+type attached struct {
 	oci.SignedImage
 	layer v1.Layer
 }
 
-var _ oci.File = (*attache)(nil)
+var _ oci.File = (*attached)(nil)
 
 // FileMediaType implements oci.File
-func (f *attache) FileMediaType() (types.MediaType, error) {
+func (f *attached) FileMediaType() (types.MediaType, error) {
 	return f.layer.MediaType()
 }
 
 // Payload implements oci.File
-func (f *attache) Payload() ([]byte, error) {
+func (f *attached) Payload() ([]byte, error) {
 	// remote layers are believed to be stored
 	// compressed, but we don't compress attachments
 	// so use "Compressed" to access the raw byte
